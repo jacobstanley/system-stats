@@ -1,0 +1,25 @@
+Dir.chdir File.dirname(__FILE__)
+
+CFG = 'dist/setup-config'.freeze
+
+########################################################################
+# Build
+
+task :default => :build
+
+task :clean do
+  sh 'cabal clean'
+end
+
+file CFG do
+  sh 'cabal configure'
+end
+
+task :build => [CFG] do
+  sh 'cabal build'
+end
+
+task :deps do
+  sh 'cabal update'
+  sh 'cabal install --only-dependencies'
+end

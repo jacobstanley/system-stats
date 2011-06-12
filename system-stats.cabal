@@ -1,7 +1,6 @@
 name:          system-stats
 version:       0.1
 synopsis:      Cross platform access to stats like CPU, RAM & Disk usage
---Description:
 homepage:      http://github.com/jystic/system-stats
 license:       BSD3
 license-file:  LICENSE
@@ -12,23 +11,32 @@ category:      System
 build-type:    Simple
 cabal-version: >=1.2
 
+extra-source-files:
+  cbits/darwin_cpu.h
+
 source-repository head
   type:     git
   location: https://github.com/jystic/system-stats.git
 
 library
   hs-source-dirs: src
+  include-dirs: cbits
+  -- cc-options: -Wall -Werror
 
   exposed-modules:
     System.Stats.CPU
 
   build-depends:
     base == 4.*,
+    bindings-DSL >= 1.0.7 && < 1.1,
     bytestring == 0.9.*
 
   ghc-options:
-    -Wall
+    -- -Wall
     -funbox-strict-fields
     -fwarn-tabs
     -fno-warn-orphans
     -fno-warn-unused-do-bind
+
+  if os(darwin)
+    c-sources: cbits/darwin_cpu.c

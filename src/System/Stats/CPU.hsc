@@ -1,5 +1,11 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE OverloadedStrings #-}
+
+#ifdef darwin_HOST_OS
+#include <bindings.dsl.h>
+#include <darwin_cpu.h>
+#endif
 
 module System.Stats.CPU
     ( CPUStats (..)
@@ -15,6 +21,24 @@ import           System.IO (openFile, hClose, IOMode(..))
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
 
+
+#ifdef darwin_HOST_OS
+
+#strict_import
+
+#starttype cpu_usage_t
+#field user , CUInt
+#field system , CUInt
+#field idle , CUInt
+#field nice , CUInt
+#stoptype
+
+#ccall c_get_cpu_usage , Ptr (Ptr <cpu_usage_t>) -> Ptr CInt -> IO CInt
+
+#ccall c_free_cpu_usage , Ptr <cpu_usage_t>
+
+#endif
+
 ------------------------------------------------------------------------
 -- Types
 
@@ -23,8 +47,8 @@ type Percentage = Double
 
 -- | CPU usage statistics for a moment in time.
 data CPUStats = CPUStats
-    { cpuUser   :: Percentage -- ^ Time spent executing processes in user mode
-    , cpuSystem :: Percentage -- ^ Time spent executing processes in system/kernel mode
+    { cpuUser   :: Percentage -- ^ Time spent executing user processes
+    , cpuSystem :: Percentage -- ^ Time spent executing system processes
     , cpuIdle   :: Percentage -- ^ Time spent doing nothing
     } deriving (Show)
 
@@ -34,7 +58,7 @@ data CPUStats = CPUStats
 
 -- | Samples the CPU statistics for the current time.
 getCPUStats :: IO CPUStats
-#ifdef linux_HOST_OS
+#if defined(linux_HOST_OS)
 getCPUStats = parseStat <$> readFile' "/proc/stat"
 #else
 getCPUStats = error "getCPUStats: not supported on this platform"
@@ -42,6 +66,8 @@ getCPUStats = error "getCPUStats: not supported on this platform"
 
 ------------------------------------------------------------------------
 -- Linux
+
+#if defined(linux_HOST_OS)
 
 parseStat :: ByteString -> CPUStats
 parseStat = parseStatCPU . fromJust . (find (B.isPrefixOf "cpu ")) . B.lines
@@ -58,8 +84,6 @@ parseStatCPU s = CPUStats
     (_:user:nice:sys:idle:iowait:hardirq:softirq:_) = map readNumber (B.words s)
     readNumber = fromInteger . toInteger . fst . fromJust . B.readInt
 
-------------------------------------------------------------------------
--- Utils
 
 -- | Reads an entire file strictly into a 'ByteString'. This differs
 -- from the 'B.readFile' shipped with the bytestring package in that it
@@ -67,3 +91,14 @@ parseStatCPU s = CPUStats
 -- uses to report system information (eg. \/proc\/stat).
 readFile' :: FilePath -> IO ByteString
 readFile' f = bracket (openFile f ReadMode) hClose B.hGetContents
+
+#endif
+
+
+------------------------------------------------------------------------
+-- OS/X
+
+#if defined(darwin_HOST_OS)
+
+
+#endif
