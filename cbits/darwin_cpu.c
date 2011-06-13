@@ -5,7 +5,7 @@
 #include "darwin_cpu.h"
 
 
-int c_get_cpu_usage(cpu_usage_t **usage_array, int *count)
+int get_cpu_usage(cpu_usage_t **usage_array, int *count)
 {
     *count = 0;
     *usage_array = 0;
@@ -47,7 +47,7 @@ int c_get_cpu_usage(cpu_usage_t **usage_array, int *count)
 }
 
 
-void c_free_cpu_usage(cpu_usage_t *usage_array)
+void free_cpu_usage(cpu_usage_t *usage_array)
 {
     free(usage_array);
 }

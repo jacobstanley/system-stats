@@ -6,17 +6,22 @@ CFG = 'dist/setup-config'.freeze
 # Build
 
 task :default => :build
+task :rebuild => [:clean, :build]
 
 task :clean do
   sh 'cabal clean'
 end
 
 file CFG do
-  sh 'cabal configure'
+  sh 'cabal configure --enable-tests'
 end
 
-task :build => [CFG] do
+task :build => CFG do
   sh 'cabal build'
+end
+
+task :test => :build do
+  sh 'cabal test'
 end
 
 task :deps do

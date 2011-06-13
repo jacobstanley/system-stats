@@ -18,7 +18,7 @@ typedef struct cpu_usage {
  * usage_array [out] the array of usage info (one per CPU)
  * count       [out] the number of CPUs
  */
-int c_get_cpu_usage(cpu_usage_t **usage_array, int *count);
+int get_cpu_usage(cpu_usage_t **usage_array, int *count);
 
 
 /**
@@ -26,4 +26,4 @@ int c_get_cpu_usage(cpu_usage_t **usage_array, int *count);
  *
  * usage_array [in] the array allocated by 'c_get_cpu_usage'
  */
-void c_free_cpu_usage(cpu_usage_t *usage_array);
+void free_cpu_usage(cpu_usage_t *usage_array);

@@ -10,6 +10,10 @@
 module System.Stats.CPU
     ( CPUStats (..)
     , getCPUStats
+
+    , C'cpu_usage_t
+    , c'get_cpu_usage
+    , c'free_cpu_usage
     ) where
 
 import           Control.Applicative ((<$>))
@@ -27,15 +31,15 @@ import qualified Data.ByteString.Char8 as B
 #strict_import
 
 #starttype cpu_usage_t
-#field user , CUInt
-#field system , CUInt
-#field idle , CUInt
-#field nice , CUInt
+#field user,   CUInt
+#field system, CUInt
+#field idle,   CUInt
+#field nice,   CUInt
 #stoptype
 
-#ccall c_get_cpu_usage , Ptr (Ptr <cpu_usage_t>) -> Ptr CInt -> IO CInt
+#ccall get_cpu_usage, Ptr (Ptr <cpu_usage_t>) -> Ptr CInt -> IO CInt
 
-#ccall c_free_cpu_usage , Ptr <cpu_usage_t>
+#ccall free_cpu_usage, Ptr <cpu_usage_t> -> IO ()
 
 #endif
 

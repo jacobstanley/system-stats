@@ -9,7 +9,7 @@ maintainer:    Jacob Stanley <jacob@stanley.io>
 copyright:     Copyright (c) Jacob Stanley 2011
 category:      System
 build-type:    Simple
-cabal-version: >=1.2
+cabal-version: >=1.9.2
 
 extra-source-files:
   cbits/darwin_cpu.h
@@ -40,3 +40,12 @@ library
 
   if os(darwin)
     c-sources: cbits/darwin_cpu.c
+
+test-suite test-system-stats
+  type: exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: DarwinTests.hs
+
+  build-depends:
+    system-stats,
+    base == 4.*
